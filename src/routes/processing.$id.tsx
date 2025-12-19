@@ -17,7 +17,7 @@ function ProcessingComponent() {
 
     const pollStatus = async () => {
       try {
-        const response = await fetch(`/netlify/functions/status?id=${id}`)
+        const response = await fetch(`/.netlify/functions/status?id=${id}`)
         if (response.ok) {
           const data = await response.json()
           setStatus(data.status)
