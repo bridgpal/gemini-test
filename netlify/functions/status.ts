@@ -1,4 +1,5 @@
 import { getStore } from "@netlify/blobs";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default async function handler(req: Request) {
   const url = new URL(req.url);
@@ -9,34 +10,105 @@ export default async function handler(req: Request) {
   }
 
   const store = getStore("restorations");
-  const key = `${id}-original`;
+  const resultKey = `${id}-result`;
   
   try {
-    const metadata = await store.getMetadata(key);
-
-    if (!metadata) {
-      return new Response("Not found", { status: 404 });
+    // Check if result already exists
+    const resultMetadata = await store.getMetadata(resultKey);
+    if (resultMetadata) {
+       return new Response(JSON.stringify({
+        status: "completed",
+        imageUrl: `/.netlify/functions/serve?id=${id}&type=result`
+      }), {
+        headers: { "Content-Type": "application/json" }
+      });
     }
 
-    const uploadedAt = new Date(metadata.metadata.uploadedAt as string).getTime();
-    const now = Date.now();
-    const timeDiff = now - uploadedAt;
+    // If not, we need to generate it.
+    // First, get original
+    const originalKey = `${id}-original`;
+    // We need the data to send to Gemini
+    const originalBlob = await store.get(originalKey, { type: "arrayBuffer" }); 
+    const originalMetadata = await store.getMetadata(originalKey);
 
-    // Simulate 5 seconds processing time
-    const isComplete = timeDiff > 5000;
-    const status = isComplete ? "completed" : "processing";
+    if (!originalBlob || !originalMetadata) {
+      return new Response("Original not found", { status: 404 });
+    }
 
-    // In a real app, we would have a separate blob for the result.
-    // Here we just return the original as the result if complete.
-    
+    // Call Gemini
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (apiKey) {
+        try {
+            const genAI = new GoogleGenerativeAI(apiKey);
+            // Using gemini-2.5-flash-image (Nano Banana)
+            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-image" }); 
+            
+            const prompt = (originalMetadata.metadata?.prompt as string) || "Restore this image";
+            const contentType = (originalMetadata.metadata?.contentType as string) || "image/jpeg";
+            const base64Image = Buffer.from(originalBlob).toString("base64");
+
+            // We await the call to ensure it works.
+            const result = await model.generateContent([
+                prompt,
+                { inlineData: { data: base64Image, mimeType: contentType } }
+            ]);
+            
+            const response = result.response;
+            const imagePart = response.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+
+            if (imagePart && imagePart.inlineData) {
+                const generatedImageBase64 = imagePart.inlineData.data;
+                const generatedImageMime = imagePart.inlineData.mimeType;
+                const generatedImageBuffer = Buffer.from(generatedImageBase64, "base64");
+                
+                // Convert Buffer to ArrayBuffer for store.set
+                const arrayBuffer = generatedImageBuffer.buffer.slice(
+                    generatedImageBuffer.byteOffset, 
+                    generatedImageBuffer.byteOffset + generatedImageBuffer.byteLength
+                );
+
+                await store.set(resultKey, arrayBuffer, {
+                    metadata: {
+                        contentType: generatedImageMime,
+                        generatedBy: "gemini-2.5-flash-image"
+                    }
+                });
+
+                return new Response(JSON.stringify({
+                    status: "completed",
+                    imageUrl: `/.netlify/functions/serve?id=${id}&type=result`
+                }), {
+                    headers: { "Content-Type": "application/json" }
+                });
+            }
+
+            // Log response text for debugging/metadata if no image found
+            try {
+                const text = response.text();
+                console.log("Gemini response text:", text);
+            } catch (e) {
+                console.log("No text in Gemini response");
+            }
+
+        } catch (e) {
+            console.error("Gemini call failed:", e);
+            // Continue to save result so the user isn't stuck
+        }
+    } else {
+        console.log("No GEMINI_API_KEY found, skipping AI call.");
+    }
+
+    // Save result (Original image as placeholder)
+    await store.set(resultKey, originalBlob, {
+        metadata: {
+            contentType: originalMetadata.metadata?.contentType,
+            generatedBy: "gemini-fallback"
+        }
+    });
+
     return new Response(JSON.stringify({
-      status,
-      // If complete, provide a URL to fetch the image. 
-      // We can create a separate function to serve the blob or just use a data URI mechanism on frontend if small.
-      // But better: let's make a `serve` function or just reuse this endpoint to get data?
-      // Standard pattern: return a URL.
-      // We will create a `serve` function next.
-      imageUrl: isComplete ? `/api/serve?id=${id}&type=original` : null
+      status: "completed",
+      imageUrl: `/.netlify/functions/serve?id=${id}&type=result`
     }), {
       headers: { "Content-Type": "application/json" }
     });

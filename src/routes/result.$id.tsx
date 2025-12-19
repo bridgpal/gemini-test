@@ -17,14 +17,14 @@ function ResultComponent() {
                We use a timestamp to prevent caching if re-running.
            */}
           <img 
-            src={`/netlify/functions/serve?id=${id}&type=result`} 
+            src={`/.netlify/functions/serve?id=${id}&type=result`} 
             alt="Restored" 
             className="result-image"
           />
           
           <div style={{ display: 'flex', gap: '1rem' }}>
              <a 
-               href={`/netlify/functions/serve?id=${id}&type=result`} 
+               href={`/.netlify/functions/serve?id=${id}&type=result`} 
                download={`restored-${id}.jpg`}
              >
                <button>Download Photo</button>

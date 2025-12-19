@@ -9,6 +9,7 @@
     "start": "vite start"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@netlify/blobs": "^10.5.0",
     "@netlify/vite-plugin-tanstack-start": "^1.0.0",
     "@tanstack/react-router": "^1.136.3",
