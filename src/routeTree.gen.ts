@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ResultIdRouteImport } from './routes/result.$id'
-import { Route as ProcessingIdRouteImport } from './routes/processing.$id'
 
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
@@ -29,43 +28,34 @@ const ResultIdRoute = ResultIdRouteImport.update({
   path: '/result/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProcessingIdRoute = ProcessingIdRouteImport.update({
-  id: '/processing/$id',
-  path: '/processing/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/processing/$id': typeof ProcessingIdRoute
   '/result/$id': typeof ResultIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/processing/$id': typeof ProcessingIdRoute
   '/result/$id': typeof ResultIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/processing/$id': typeof ProcessingIdRoute
   '/result/$id': typeof ResultIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/processing/$id' | '/result/$id'
+  fullPaths: '/' | '/about' | '/result/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/processing/$id' | '/result/$id'
-  id: '__root__' | '/' | '/about' | '/processing/$id' | '/result/$id'
+  to: '/' | '/about' | '/result/$id'
+  id: '__root__' | '/' | '/about' | '/result/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  ProcessingIdRoute: typeof ProcessingIdRoute
   ResultIdRoute: typeof ResultIdRoute
 }
 
@@ -92,20 +82,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResultIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/processing/$id': {
-      id: '/processing/$id'
-      path: '/processing/$id'
-      fullPath: '/processing/$id'
-      preLoaderRoute: typeof ProcessingIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  ProcessingIdRoute: ProcessingIdRoute,
   ResultIdRoute: ResultIdRoute,
 }
 export const routeTree = rootRouteImport

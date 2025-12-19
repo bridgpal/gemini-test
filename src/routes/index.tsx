@@ -8,8 +8,9 @@ export const Route = createFileRoute('/')({
 function HomeComponent() {
   const navigate = useNavigate()
   const [isDragging, setIsDragging] = useState(false)
-  const [isUploading, setIsUploading] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [statusMessage, setStatusMessage] = useState('')
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -21,29 +22,43 @@ function HomeComponent() {
     setIsDragging(false)
   }, [])
 
-  const uploadFile = async (file: File) => {
-    setIsUploading(true)
+  const processImage = async (file: File) => {
+    setIsProcessing(true)
     setError(null)
+    setStatusMessage('Uploading image...')
 
     const formData = new FormData()
     formData.append('image', file)
 
     try {
-      const response = await fetch('/.netlify/functions/upload', {
+      setStatusMessage('Processing with Gemini AI...')
+
+      const response = await fetch('/.netlify/functions/restore', {
         method: 'POST',
         body: formData,
       })
 
-      if (!response.ok) {
-        throw new Error('Upload failed')
+      const data = await response.json()
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || data.text || 'Processing failed')
       }
 
-      const data = await response.json()
-      navigate({ to: '/processing/$id', params: { id: data.id } })
+      // Store result in sessionStorage and navigate to result page
+      const resultId = crypto.randomUUID()
+      sessionStorage.setItem(`result-${resultId}`, JSON.stringify({
+        imageUrl: data.imageUrl,
+        text: data.text,
+        model: data.model
+      }))
+
+      navigate({ to: '/result/$id', params: { id: resultId } })
     } catch (err) {
       console.error(err)
-      setError('Failed to upload image. Please try again.')
-      setIsUploading(false)
+      const errorMessage = err instanceof Error ? err.message : 'Failed to process image'
+      setError(errorMessage)
+      setIsProcessing(false)
+      setStatusMessage('')
     }
   }
 
@@ -52,13 +67,13 @@ function HomeComponent() {
     setIsDragging(false)
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      uploadFile(e.dataTransfer.files[0])
+      processImage(e.dataTransfer.files[0])
     }
   }, [])
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      uploadFile(e.target.files[0])
+      processImage(e.target.files[0])
     }
   }
 
@@ -75,7 +90,8 @@ function HomeComponent() {
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          onClick={() => document.getElementById('fileInput')?.click()}
+          onClick={() => !isProcessing && document.getElementById('fileInput')?.click()}
+          style={{ cursor: isProcessing ? 'wait' : 'pointer' }}
         >
           <input
             type="file"
@@ -83,9 +99,14 @@ function HomeComponent() {
             style={{ display: 'none' }}
             accept="image/*"
             onChange={handleFileSelect}
+            disabled={isProcessing}
           />
-          {isUploading ? (
-            <div className="spinner"></div>
+          {isProcessing ? (
+            <div>
+              <div className="spinner"></div>
+              <p style={{ marginTop: '1rem', fontSize: '1.1rem' }}>{statusMessage}</p>
+              <p style={{ color: '#666', marginTop: '0.5rem' }}>This may take 15-30 seconds...</p>
+            </div>
           ) : (
             <div>
               <p style={{ fontSize: '1.5rem', fontWeight: 500 }}>
@@ -95,7 +116,17 @@ function HomeComponent() {
             </div>
           )}
         </div>
-        {error && <p style={{ color: 'var(--color-earth)', marginTop: '1rem' }}>{error}</p>}
+        {error && (
+          <div style={{ marginTop: '1rem' }}>
+            <p style={{ color: 'var(--color-earth)' }}>{error}</p>
+            <button
+              onClick={() => setError(null)}
+              style={{ marginTop: '0.5rem', backgroundColor: 'var(--color-sage)', color: '#333' }}
+            >
+              Try Again
+            </button>
+          </div>
+        )}
       </div>
     </main>
   )
