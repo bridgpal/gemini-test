@@ -32,10 +32,28 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <div>
-          <Link to="/">Index</Link>
-          <Link to="/about">About</Link>
-        </div>
+        <header style={{ 
+          padding: '1rem', 
+          backgroundColor: 'var(--color-cream)', 
+          borderBottom: '4px solid var(--color-sage)',
+          marginBottom: '2rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          maxWidth: '800px',
+          margin: '0 auto 2rem auto',
+          width: '100%',
+          boxSizing: 'border-box'
+        }}>
+          <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+             <span style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--color-dark-green)' }}>
+               📷 VintageRestorer
+             </span>
+          </Link>
+          <Link to="/about" style={{ color: 'var(--color-dark-green)', textDecoration: 'none', fontWeight: 500 }}>
+            How it works
+          </Link>
+        </header>
 
         {children}
         <TanStackRouterDevtools position="bottom-right" />

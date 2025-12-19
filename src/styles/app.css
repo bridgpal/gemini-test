@@ -1,15 +1,113 @@
-body {
-  font-family:
-    Gordita, Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
-    sans-serif;
+:root {
+  --color-cream: #F2E8CF;
+  --color-sage: #A7C957;
+  --color-green: #6A994E;
+  --color-dark-green: #386641;
+  --color-earth: #BC4749;
+
+  --bg-color: var(--color-cream);
+  --text-color: var(--color-dark-green);
+  --primary-color: var(--color-green);
+  --accent-color: var(--color-earth);
+
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
 }
 
-a {
-  margin-right: 1rem;
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  display: flex;
+  place-items: center;
+  min-height: 100vh;
+  justify-content: center;
 }
 
 main {
   text-align: center;
-  padding: 1em;
-  margin: 0 auto;
+  padding: 2rem;
+  max-width: 800px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+  color: var(--color-dark-green);
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: var(--primary-color);
+  color: white;
+  cursor: pointer;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(56, 102, 65, 0.3);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.card {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(56, 102, 65, 0.1);
+  margin-top: 2rem;
+}
+
+.dropzone {
+  border: 3px dashed var(--color-sage);
+  border-radius: 12px;
+  padding: 3rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: rgba(167, 201, 87, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+.dropzone:hover, .dropzone.active {
+  border-color: var(--primary-color);
+  background-color: rgba(106, 153, 78, 0.15);
+  transform: scale(1.01);
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid var(--color-sage);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 2rem auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+img.result-image {
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
