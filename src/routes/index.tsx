@@ -5,6 +5,24 @@ export const Route = createFileRoute('/')({
   component: HomeComponent,
 })
 
+function UploadIcon() {
+  return (
+    <svg
+      className="dropzone-icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="17 8 12 3 7 8" />
+      <line x1="12" y1="3" x2="12" y2="15" />
+    </svg>
+  )
+}
+
 function HomeComponent() {
   const navigate = useNavigate()
   const [isDragging, setIsDragging] = useState(false)
@@ -80,9 +98,7 @@ function HomeComponent() {
   return (
     <main>
       <h1>Magic Restorer</h1>
-      <p style={{ fontSize: '1.2rem', marginBottom: '2rem', color: 'var(--color-dark-green)' }}>
-        Bring your old family photos back to life with our AI restoration tool.
-      </p>
+      <p className="tagline">Remaster your memories today</p>
 
       <div className="card">
         <div
@@ -104,24 +120,24 @@ function HomeComponent() {
           {isProcessing ? (
             <div>
               <div className="spinner"></div>
-              <p style={{ marginTop: '1rem', fontSize: '1.1rem' }}>{statusMessage}</p>
-              <p style={{ color: '#666', marginTop: '0.5rem' }}>This may take 15-30 seconds...</p>
+              <p className="status-text">{statusMessage}</p>
+              <p className="status-subtitle">This may take 15-30 seconds...</p>
             </div>
           ) : (
             <div>
-              <p style={{ fontSize: '1.5rem', fontWeight: 500 }}>
-                Drop your photo here
-              </p>
-              <p>or click to select a file</p>
+              <UploadIcon />
+              <p className="dropzone-title">Drop your photo here</p>
+              <p className="dropzone-subtitle">or click to select a file</p>
             </div>
           )}
         </div>
         {error && (
-          <div style={{ marginTop: '1rem' }}>
-            <p style={{ color: 'var(--color-earth)' }}>{error}</p>
+          <div className="error-message">
+            <p style={{ margin: 0 }}>{error}</p>
             <button
               onClick={() => setError(null)}
-              style={{ marginTop: '0.5rem', backgroundColor: 'var(--color-sage)', color: '#333' }}
+              className="secondary"
+              style={{ marginTop: '1rem' }}
             >
               Try Again
             </button>
