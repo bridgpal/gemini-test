@@ -49,7 +49,7 @@ function HomeComponent() {
     formData.append('image', file)
 
     try {
-      setStatusMessage('Processing with Gemini AI...')
+      setStatusMessage('Processing your image...')
 
       const response = await fetch('/.netlify/functions/restore', {
         method: 'POST',
