@@ -10,7 +10,7 @@ export default async function handler(req: Request) {
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return new Response(JSON.stringify({ error: "Gemini API key not configured" }), {
+    return new Response(JSON.stringify({ error: "API key not configured" }), {
       status: 500,
       headers: { "Content-Type": "application/json" }
     });
