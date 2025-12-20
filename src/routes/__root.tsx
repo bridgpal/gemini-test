@@ -12,7 +12,16 @@ import appCss from '~/styles/app.css?url'
 
 export const Route = createRootRoute({
   head: () => ({
-    links: [{ rel: 'stylesheet', href: appCss }],
+    meta: [
+      { charSet: 'utf-8' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { name: 'description', content: 'Magic Restorer - Remaster your memories today with AI-powered photo restoration' },
+    ],
+    links: [
+      { rel: 'stylesheet', href: appCss },
+      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+      { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
+    ],
   }),
   component: RootComponent,
 })
@@ -27,32 +36,20 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html>
+    <html lang="en">
       <head>
         <HeadContent />
       </head>
       <body>
-        <header style={{ 
-          padding: '1rem', 
-          backgroundColor: 'var(--color-cream)', 
-          borderBottom: '4px solid var(--color-sage)',
-          marginBottom: '2rem',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          maxWidth: '800px',
-          margin: '0 auto 2rem auto',
-          width: '100%',
-          boxSizing: 'border-box'
-        }}>
-          <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-             <span style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--color-dark-green)' }}>
-               📷 VintageRestorer
-             </span>
-          </Link>
-          <Link to="/about" style={{ color: 'var(--color-dark-green)', textDecoration: 'none', fontWeight: 500 }}>
-            How it works
-          </Link>
+        <header className="header">
+          <div className="header-inner">
+            <Link to="/" className="logo">
+              Magic Restorer
+            </Link>
+            <Link to="/about" className="nav-link">
+              How it works
+            </Link>
+          </div>
         </header>
 
         {children}

@@ -7,20 +7,24 @@ export const Route = createFileRoute('/about')({
 function AboutComponent() {
   return (
     <main>
-      <h1>About VintageRestorer</h1>
-      <div className="card" style={{ textAlign: 'left', lineHeight: '1.8' }}>
-        <p>
-          Welcome to <strong>VintageRestorer</strong>. We understand that your old family photos are more than just paper—they are precious memories.
-        </p>
-        <p>
-          Our goal is to help you preserve these moments for future generations. We use advanced technology to gently restore clarity, color, and life to your vintage photographs, all while keeping the original character of your loved ones intact.
-        </p>
-        <p>
-          It's simple: upload a photo, wait a moment, and download your restored memory.
-        </p>
-        <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+      <h1>How It Works</h1>
+      <div className="divider"></div>
+
+      <div className="card">
+        <div className="content-block">
+          <p>
+            Welcome to <strong>Magic Restorer</strong>. Your old family photos are more than just images—they're irreplaceable windows into cherished moments and beloved faces.
+          </p>
+          <p>
+            Our mission is to help you preserve these memories for generations to come. Using advanced AI technology, we carefully restore clarity, vibrancy, and life to your vintage photographs while maintaining the authentic character that makes them special.
+          </p>
+          <p>
+            The process is simple: upload a photo, wait a moment while our AI works its magic, and download your beautifully restored memory.
+          </p>
+        </div>
+        <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
           <Link to="/">
-            <button>Back to Home</button>
+            <button className="gold">Start Restoring</button>
           </Link>
         </div>
       </div>
